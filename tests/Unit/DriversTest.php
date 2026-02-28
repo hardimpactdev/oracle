@@ -20,7 +20,7 @@ describe('GeminiDriver', function () {
         $command = $this->driver->buildCommand('/tmp/prompt.txt', 'gemini-2.5-flash');
 
         expect($command)->toBe([
-            'gemini', '--model', 'gemini-2.5-flash', '--prompt', '', '--output-format', 'json', '--yolo',
+            'gemini', '--model', 'gemini-2.5-flash', '--output-format', 'json', '--yolo',
         ]);
     });
 

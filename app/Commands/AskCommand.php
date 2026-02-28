@@ -112,16 +112,6 @@ final class AskCommand extends Command
 
             $command = $driver->buildCommand($promptFile, $model);
 
-            // Gemini CLI v0.30+: provide prompt via --prompt (file flags changed)
-            if ($driver->name() === 'gemini') {
-                foreach ($command as $idx => $value) {
-                    if ($value === '--prompt' && isset($command[$idx + 1]) && $command[$idx + 1] === '') {
-                        $command[$idx + 1] = $prompt;
-                        break;
-                    }
-                }
-            }
-
             $result = Process::path($projectPath)
                 ->env($this->processEnv())
                 ->timeout($timeout)

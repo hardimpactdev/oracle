@@ -10,9 +10,8 @@ final readonly class GeminiDriver implements LlmDriver
 {
     public function buildCommand(string $promptFile, string $model): array
     {
-        // gemini CLI v0.30+ uses --prompt for non-interactive mode.
-        // Oracle passes the prompt via STDIN, so we set --prompt to an empty string.
-        return ['gemini', '--model', $model, '--prompt', '', '--output-format', 'json', '--yolo'];
+        // No --prompt flag: gemini CLI reads from STDIN (piped by WithLlmInvocation).
+        return ['gemini', '--model', $model, '--output-format', 'json', '--yolo'];
     }
 
     public function parseOutput(string $output): LlmResponse
