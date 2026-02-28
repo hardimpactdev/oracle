@@ -169,6 +169,77 @@ PROMPT;
     }
 
     /**
+     * Build a verification prompt to evaluate coder work against task requirements.
+     */
+    public function buildVerifyPrompt(
+        string $transcript,
+        string $taskDescription,
+        string $beadsStatus,
+        ProjectContext $context,
+        ?string $solutionsIndex = null,
+        ?array $taskMeta = null,
+    ): string {
+        $sections = [];
+
+        $sections[] = <<<'PROMPT'
+You are an expert verification agent. Evaluate whether the coder's work satisfies the task requirements.
+
+Your output MUST be valid JSON with this exact schema:
+{
+  "verdict": "pass|follow_up|package_issue|fail",
+  "summary": "Brief summary of the verification result",
+  "follow_up_question": "Specific question for the coder (only when verdict is follow_up)",
+  "package_issues": [
+    {
+      "package": "package-name",
+      "description": "Description of the package gap",
+      "severity": "low|medium|high",
+      "blocking": false
+    }
+  ],
+  "confidence": 0.85
+}
+
+Verdict criteria:
+- "pass": All beads completed, implementation matches task requirements and completion criteria, no quality issues.
+- "follow_up": Unclear whether requirements are fully met. You need a specific answer from the coder before deciding. Include a clear, actionable follow_up_question.
+- "package_issue": Implementation is acceptable but a managed/internal package has a gap or limitation that should be tracked. Include the package_issues array. The work itself passes.
+- "fail": Fundamentally wrong approach, critical requirements missed, or quality issues that cannot be fixed with follow-ups. Use sparingly — only when the work is clearly inadequate.
+
+Confidence: A value between 0.0 and 1.0 indicating how certain you are in the verdict. High confidence (>0.8) means clear evidence supports the verdict. Low confidence (<0.5) means evidence is ambiguous.
+PROMPT;
+
+        $sections[] = "## Task Description\n\n{$taskDescription}";
+
+        if ($taskMeta !== null) {
+            if (isset($taskMeta['completion_criteria']) && is_array($taskMeta['completion_criteria'])) {
+                $criteria = implode("\n- ", $taskMeta['completion_criteria']);
+                $sections[] = "## Completion Criteria\n\n- {$criteria}";
+            }
+
+            if (isset($taskMeta['complexity']) && is_string($taskMeta['complexity'])) {
+                $sections[] = "## Complexity\n\n{$taskMeta['complexity']}";
+            }
+
+            if (isset($taskMeta['previous_review_feedback']) && is_string($taskMeta['previous_review_feedback'])) {
+                $sections[] = "## Previous Review Feedback\n\nThe coder was asked to address the following feedback:\n\n{$taskMeta['previous_review_feedback']}";
+            }
+        }
+
+        $sections[] = "## Beads Status\n\n```json\n{$beadsStatus}\n```";
+
+        $sections[] = "## Session Transcript\n\n{$transcript}";
+
+        if ($solutionsIndex !== null) {
+            $sections[] = "## Solutions Index\n\nKnown solution patterns the coder should follow:\n\n{$solutionsIndex}";
+        }
+
+        $this->appendContext($sections, $context);
+
+        return implode("\n\n---\n\n", $sections);
+    }
+
+    /**
      * Append project context sections to the prompt.
      *
      * @param  array<string>  $sections

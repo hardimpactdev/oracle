@@ -100,6 +100,79 @@ describe('PromptBuilder', function () {
         });
     });
 
+    describe('buildVerifyPrompt', function () {
+        it('includes transcript task description and beads status', function () {
+            $context = new ProjectContext(projectPath: '/tmp/test');
+
+            $prompt = $this->builder->buildVerifyPrompt(
+                '[{"role":"user","content":"hello"}]',
+                'Implement dark mode',
+                '{"total":5,"completed":5}',
+                $context,
+            );
+
+            expect($prompt)
+                ->toContain('[{"role":"user","content":"hello"}]')
+                ->toContain('Implement dark mode')
+                ->toContain('"total":5,"completed":5')
+                ->toContain('"verdict"')
+                ->toContain('expert verification agent');
+        });
+
+        it('includes solutions index when provided', function () {
+            $context = new ProjectContext(projectPath: '/tmp/test');
+
+            $prompt = $this->builder->buildVerifyPrompt(
+                'transcript',
+                'task',
+                '{}',
+                $context,
+                "- architecture/task-gate.md\n- logic-errors/status-bug.md",
+            );
+
+            expect($prompt)
+                ->toContain('Solutions Index')
+                ->toContain('task-gate.md');
+        });
+
+        it('includes completion criteria from task meta', function () {
+            $context = new ProjectContext(projectPath: '/tmp/test');
+            $meta = ['completion_criteria' => ['All tests pass', 'No PHPStan errors']];
+
+            $prompt = $this->builder->buildVerifyPrompt('transcript', 'task', '{}', $context, null, $meta);
+
+            expect($prompt)
+                ->toContain('Completion Criteria')
+                ->toContain('All tests pass')
+                ->toContain('No PHPStan errors');
+        });
+
+        it('includes previous review feedback from task meta', function () {
+            $context = new ProjectContext(projectPath: '/tmp/test');
+            $meta = ['previous_review_feedback' => 'Missing error handling'];
+
+            $prompt = $this->builder->buildVerifyPrompt('transcript', 'task', '{}', $context, null, $meta);
+
+            expect($prompt)
+                ->toContain('Previous Review Feedback')
+                ->toContain('Missing error handling');
+        });
+
+        it('appends project context', function () {
+            $context = new ProjectContext(
+                projectPath: '/tmp/test',
+                conventions: '# Rules: Use strict types.',
+                memories: [['content' => 'Always use lockForUpdate', 'source' => 'oracle']],
+            );
+
+            $prompt = $this->builder->buildVerifyPrompt('transcript', 'task', '{}', $context);
+
+            expect($prompt)
+                ->toContain('Use strict types')
+                ->toContain('Always use lockForUpdate');
+        });
+    });
+
     describe('buildAskPrompt', function () {
         it('includes the question', function () {
             $context = new ProjectContext(projectPath: '/tmp/test');
