@@ -240,6 +240,95 @@ PROMPT;
     }
 
     /**
+     * Build a compound prompt to extract learnings from a coder session transcript.
+     */
+    public function buildCompoundPrompt(
+        string $transcript,
+        string $taskDescription,
+        ProjectContext $context,
+        ?string $solutionsIndex = null,
+        ?string $packagesDoc = null,
+        ?array $taskMeta = null,
+    ): string {
+        $sections = [];
+
+        $sections[] = <<<'PROMPT'
+You are an expert at extracting reusable knowledge from coding sessions. Analyze the session transcript and identify:
+
+1. **New solution docs** — Solved problems worth documenting for future reference (debugging insights, non-obvious patterns, workarounds).
+2. **Stale solution docs** — Existing docs that are now outdated or superseded by this work.
+3. **Package tasks** — Issues in managed/internal packages that should be tracked separately.
+
+Your output MUST be valid JSON with this exact schema:
+{
+  "learnings": [
+    {
+      "action": "create",
+      "file": "docs/solutions/category/descriptive-name-YYYYMMDD.md",
+      "content": "Full markdown content for the solution doc",
+      "reason": "Why this is worth documenting"
+    },
+    {
+      "action": "archive",
+      "existing_file": "docs/solutions/category/old-doc.md",
+      "file": "docs/solutions/.archive/category/old-doc.md",
+      "reason": "Why this doc is now stale"
+    }
+  ],
+  "package_tasks": [
+    {
+      "package": "package-name",
+      "title": "Short task title",
+      "description": "What needs to be fixed or improved",
+      "severity": "missing_feature|bug|improvement"
+    }
+  ],
+  "summary": "Brief summary of what was learned"
+}
+
+Guidelines for solution docs:
+- Only extract genuinely reusable knowledge — skip routine implementations
+- File names must follow: docs/solutions/{category}/{descriptive-slug}-{YYYYMMDD}.md
+- Categories: build-errors, logic-errors, test-failures, security-issues, workflow, performance, conventions
+- Content should be self-contained: problem, root cause, solution, prevention
+- Do NOT create docs for things already well-documented in project conventions
+- Return empty learnings array if nothing is worth documenting
+
+Guidelines for package tasks:
+- Only flag issues in managed packages, not application code
+- Include clear reproduction context
+- Return empty array if no package issues found
+PROMPT;
+
+        $sections[] = "## Task Description\n\n{$taskDescription}";
+
+        if ($taskMeta !== null) {
+            if (isset($taskMeta['completion_criteria']) && is_array($taskMeta['completion_criteria'])) {
+                $criteria = implode("\n- ", $taskMeta['completion_criteria']);
+                $sections[] = "## Completion Criteria\n\n- {$criteria}";
+            }
+
+            if (isset($taskMeta['work_type']) && is_string($taskMeta['work_type'])) {
+                $sections[] = "## Work Type\n\n{$taskMeta['work_type']}";
+            }
+        }
+
+        $sections[] = "## Session Transcript\n\n{$transcript}";
+
+        if ($solutionsIndex !== null) {
+            $sections[] = "## Existing Solutions Index\n\nThese solution docs already exist — do not duplicate them. Only create new docs or archive stale ones:\n\n{$solutionsIndex}";
+        }
+
+        if ($packagesDoc !== null) {
+            $sections[] = "## Managed Packages\n\nThese are internal/managed packages. Flag issues found in them:\n\n{$packagesDoc}";
+        }
+
+        $this->appendContext($sections, $context);
+
+        return implode("\n\n---\n\n", $sections);
+    }
+
+    /**
      * Append project context sections to the prompt.
      *
      * @param  array<string>  $sections
