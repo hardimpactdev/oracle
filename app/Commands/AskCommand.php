@@ -58,7 +58,36 @@ final class AskCommand extends Command
         if ($file !== null && is_file($file)) {
             $fileContent = file_get_contents($file);
             if ($fileContent !== false) {
-                $question .= "\n\n## Additional Context (from {$file})\n\n{$fileContent}";
+                $decoded = json_decode($fileContent, true);
+                if (is_array($decoded) && isset($decoded['description'])) {
+                    // Task metadata file — extract structured context
+                    $taskContext = "## Task Context\n\n";
+                    $taskContext .= "**Title:** " . ($decoded['title'] ?? 'N/A') . "\n";
+                    $taskContext .= "**Description:** {$decoded['description']}\n";
+
+                    if (isset($decoded['meta']) && is_array($decoded['meta'])) {
+                        $meta = $decoded['meta'];
+                        if (isset($meta['completion_criteria']) && is_array($meta['completion_criteria'])) {
+                            $taskContext .= "\n**Completion Criteria:**\n";
+                            foreach ($meta['completion_criteria'] as $criterion) {
+                                $taskContext .= "- {$criterion}\n";
+                            }
+                        }
+                        if (isset($meta['learnings']) && is_string($meta['learnings']) && $meta['learnings'] !== '') {
+                            $taskContext .= "\n**Institutional Knowledge:**\n{$meta['learnings']}\n";
+                        }
+                        if (isset($meta['work_type']) && is_string($meta['work_type'])) {
+                            $taskContext .= "\n**Work type:** {$meta['work_type']}\n";
+                        }
+                        if (isset($meta['complexity']) && is_string($meta['complexity'])) {
+                            $taskContext .= "\n**Complexity:** {$meta['complexity']}\n";
+                        }
+                    }
+
+                    $question .= "\n\n{$taskContext}";
+                } else {
+                    $question .= "\n\n## Additional Context (from {$file})\n\n{$fileContent}";
+                }
             }
         }
 
@@ -83,9 +112,20 @@ final class AskCommand extends Command
 
             $command = $driver->buildCommand($promptFile, $model);
 
+            // Gemini CLI v0.30+: provide prompt via --prompt (file flags changed)
+            if ($driver->name() === 'gemini') {
+                foreach ($command as $idx => $value) {
+                    if ($value === '--prompt' && isset($command[$idx + 1]) && $command[$idx + 1] === '') {
+                        $command[$idx + 1] = $prompt;
+                        break;
+                    }
+                }
+            }
+
             $result = Process::path($projectPath)
                 ->env($this->processEnv())
                 ->timeout($timeout)
+                ->input($prompt)
                 ->run($command);
 
             if (! $result->successful()) {
