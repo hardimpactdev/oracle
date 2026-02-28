@@ -30,6 +30,7 @@ trait WithLlmInvocation
             $result = Process::path($workingDirectory)
                 ->env($this->processEnv())
                 ->timeout($timeout)
+                ->input($prompt)
                 ->run($command);
 
             if (! $result->successful()) {
