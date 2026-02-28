@@ -25,6 +25,7 @@ final class ReviewCommand extends Command
         {--pr= : PR URL to review}
         {--diff= : Git diff reference (e.g. HEAD~3)}
         {--branch= : Branch to compare against main}
+        {--task-file= : Path to task metadata JSON (for context)}
         {--project= : Path to the project (defaults to cwd)}
         {--driver= : LLM driver (gemini, claude, codex)}
         {--model= : LLM model to use}
@@ -64,13 +65,16 @@ final class ReviewCommand extends Command
         // Gather context
         $context = $gatherer->gather($projectPath, 'code review');
 
+        // Read task description from file if provided
+        $taskDescription = $this->readTaskDescription();
+
         // Internal projects for workaround detection
         $internalProjects = $this->option('detect-workarounds')
             ? ($config->projectGet('internal_projects') ?? [])
             : null;
 
         // Build prompt
-        $prompt = $promptBuilder->buildReviewPrompt($diff, $context, null, $internalProjects);
+        $prompt = $promptBuilder->buildReviewPrompt($diff, $context, $taskDescription, $internalProjects);
 
         // Invoke LLM
         try {
@@ -92,6 +96,36 @@ final class ReviewCommand extends Command
         $this->renderReview($review);
 
         return self::SUCCESS;
+    }
+
+    private function readTaskDescription(): ?string
+    {
+        /** @var string|null $taskFile */
+        $taskFile = $this->option('task-file');
+
+        if ($taskFile === null || ! is_file($taskFile)) {
+            return null;
+        }
+
+        $content = file_get_contents($taskFile);
+        if ($content === false) {
+            return null;
+        }
+
+        $decoded = json_decode($content, true);
+        if (! is_array($decoded)) {
+            return null;
+        }
+
+        $parts = [];
+        if (isset($decoded['title']) && is_string($decoded['title'])) {
+            $parts[] = $decoded['title'];
+        }
+        if (isset($decoded['description']) && is_string($decoded['description'])) {
+            $parts[] = $decoded['description'];
+        }
+
+        return $parts !== [] ? implode("\n\n", $parts) : null;
     }
 
     private function resolveDiff(string $projectPath): ?string
