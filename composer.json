@@ -9,6 +9,7 @@
         "laravel-zero/framework": "^12.0.2"
     },
     "require-dev": {
+        "humbug/box": "^4.6",
         "laravel/pint": "^1.25.1",
         "mockery/mockery": "^1.6.12",
         "pestphp/pest": "^4.1.2"
