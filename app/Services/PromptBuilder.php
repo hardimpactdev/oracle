@@ -18,6 +18,12 @@ final class PromptBuilder
         $sections[] = <<<'PROMPT'
 You are an expert software architect. Analyze the following task and create a structured implementation plan.
 
+Before planning, perform two checks:
+
+1. **Already-implemented check**: Search the codebase for evidence that this task has already been implemented (matching class names, routes, tests, or functionality). If you find strong evidence, set `already_implemented.detected = true` with evidence and confidence.
+
+2. **Impact analysis**: Assess the risk level of this task. Flag tasks that are destructive (data deletion, schema drops, permission changes), too ambiguous to implement safely, or affect critical paths (auth, payments, data integrity).
+
 Your output MUST be valid JSON with this exact schema:
 {
   "steps": [
@@ -28,8 +34,22 @@ Your output MUST be valid JSON with this exact schema:
       "verification": "How to verify this step is complete"
     }
   ],
-  "summary": "One paragraph summary of the plan"
+  "summary": "One paragraph summary of the plan",
+  "already_implemented": {
+    "detected": false,
+    "evidence": "Description of what was found (empty string if not detected)",
+    "confidence": 0.0
+  },
+  "impact_analysis": {
+    "risk_level": "low|medium|high|critical",
+    "concerns": ["List of specific concerns, empty array if none"],
+    "requires_review": false
+  }
 }
+
+- If `already_implemented.detected` is true with confidence > 0.8, the task will be blocked for human review.
+- If `impact_analysis.risk_level` is "critical" or `requires_review` is true, the task will be blocked for human review.
+- For normal tasks, set `already_implemented.detected = false` and `impact_analysis.risk_level = "low"`.
 PROMPT;
 
         $sections[] = "## Task\n\n{$taskDescription}";
@@ -66,7 +86,7 @@ You are an expert code reviewer. Review the following changes against the projec
 
 Your output MUST be valid JSON with this exact schema:
 {
-  "verdict": "approve" or "request_changes",
+  "verdict": "approve" or "changes_requested",
   "summary": "Brief summary of the review",
   "comments": [
     {
@@ -75,7 +95,7 @@ Your output MUST be valid JSON with this exact schema:
       "body": "Review comment explaining the issue"
     }
   ],
-  "workarounds": [
+  "friction_points": [
     {
       "project": "project-name or null",
       "description": "Description of the workaround/friction point",
@@ -256,8 +276,9 @@ PROMPT;
 You are an expert at extracting reusable knowledge from coding sessions. Analyze the session transcript and identify:
 
 1. **New solution docs** — Solved problems worth documenting for future reference (debugging insights, non-obvious patterns, workarounds).
-2. **Stale solution docs** — Existing docs that are now outdated or superseded by this work.
-3. **Package tasks** — Issues in managed/internal packages that should be tracked separately.
+2. **Updated solution docs** — Existing docs that need corrections or additions based on this work.
+3. **Stale solution docs** — Existing docs that are now outdated or superseded and should be deleted.
+4. **Package tasks** — Issues in managed/internal packages that should be tracked separately.
 
 Your output MUST be valid JSON with this exact schema:
 {
@@ -269,10 +290,16 @@ Your output MUST be valid JSON with this exact schema:
       "reason": "Why this is worth documenting"
     },
     {
-      "action": "archive",
+      "action": "update",
+      "existing_file": "docs/solutions/category/existing-doc.md",
+      "file": "docs/solutions/category/existing-doc.md",
+      "content": "Full updated markdown content",
+      "reason": "What changed and why the update is needed"
+    },
+    {
+      "action": "delete",
       "existing_file": "docs/solutions/category/old-doc.md",
-      "file": "docs/solutions/.archive/category/old-doc.md",
-      "reason": "Why this doc is now stale"
+      "reason": "Why this doc is now stale or superseded"
     }
   ],
   "package_tasks": [
@@ -292,6 +319,8 @@ Guidelines for solution docs:
 - Categories: build-errors, logic-errors, test-failures, security-issues, workflow, performance, conventions
 - Content should be self-contained: problem, root cause, solution, prevention
 - Do NOT create docs for things already well-documented in project conventions
+- Use "update" when an existing doc needs corrections or additions based on new findings
+- Use "delete" when an existing doc is fully superseded or no longer accurate — do NOT archive
 - Return empty learnings array if nothing is worth documenting
 
 Guidelines for package tasks:

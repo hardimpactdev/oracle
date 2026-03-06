@@ -7,7 +7,7 @@ namespace App\Data;
 final readonly class ReviewResult
 {
     /**
-     * @param  'approve'|'request_changes'  $verdict
+     * @param  'approve'|'changes_requested'  $verdict
      * @param  array<array{path: string, line: int|null, body: string}>  $comments
      * @param  array<array{project: string|null, description: string, severity: string}>  $frictionPoints
      */
@@ -34,7 +34,7 @@ final readonly class ReviewResult
     public static function fromArray(array $data): self
     {
         return new self(
-            verdict: $data['verdict'] ?? 'request_changes',
+            verdict: $data['verdict'] ?? 'changes_requested',
             summary: $data['summary'] ?? '',
             comments: $data['comments'] ?? [],
             frictionPoints: $data['friction_points'] ?? $data['workarounds'] ?? [],

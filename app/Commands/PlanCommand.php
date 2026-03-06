@@ -172,6 +172,26 @@ final class PlanCommand extends Command
     private function renderPlan(PlanResult $plan): void
     {
         $this->newLine();
+
+        if ($plan->alreadyImplemented !== null && ($plan->alreadyImplemented['detected'] ?? false)) {
+            $confidence = $plan->alreadyImplemented['confidence'] ?? 0;
+            $this->line("<fg=yellow;options=bold>⚠ ALREADY IMPLEMENTED (confidence: {$confidence})</>");
+            $this->line($plan->alreadyImplemented['evidence'] ?? '');
+            $this->newLine();
+        }
+
+        if ($plan->impactAnalysis !== null) {
+            $risk = $plan->impactAnalysis['risk_level'] ?? 'low';
+            if ($risk !== 'low') {
+                $color = $risk === 'critical' ? 'red' : ($risk === 'high' ? 'red' : 'yellow');
+                $this->line("<fg={$color};options=bold>Risk Level: {$risk}</>");
+                foreach ($plan->impactAnalysis['concerns'] ?? [] as $concern) {
+                    $this->line("  - {$concern}");
+                }
+                $this->newLine();
+            }
+        }
+
         $this->line('<fg=cyan;options=bold>Plan Summary:</>');
         $this->line($plan->summary);
         $this->newLine();

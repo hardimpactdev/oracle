@@ -7,7 +7,7 @@ namespace App\Data;
 final readonly class CompoundResult
 {
     /**
-     * @param  array<int, array{action: string, file: string, content?: string, reason: string, existing_file?: string}>  $learnings
+     * @param  array<int, array{action: 'create'|'update'|'delete', file?: string, content?: string, reason: string, existing_file?: string}>  $learnings
      * @param  array<int, array{package: string, title: string, description: string, severity: string}>  $packageTasks
      */
     public function __construct(
