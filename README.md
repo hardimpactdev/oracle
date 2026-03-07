@@ -4,30 +4,30 @@ Project-aware AI tool for planning, reviewing, verifying, and learning from code
 
 ## Commands
 
-### `oracle plan`
+### `dexter plan`
 
 Generate a structured implementation plan from a task description.
 
 ```bash
-oracle plan "Add dark mode support" --project /path/to/project --json
-oracle plan --file task.json --project /path/to/project --json
+dexter plan "Add dark mode support" --project /path/to/project --json
+dexter plan --file task.json --project /path/to/project --json
 ```
 
-### `oracle review`
+### `dexter review`
 
 Review code changes against project conventions.
 
 ```bash
-oracle review --branch feature/thing --project /path/to/project --json
-oracle review --pr 42 --project /path/to/project --detect-workarounds --json
+dexter review --branch feature/thing --project /path/to/project --json
+dexter review --pr 42 --project /path/to/project --detect-workarounds --json
 ```
 
-### `oracle verify`
+### `dexter verify`
 
 Verify coder work against task requirements and beads completion.
 
 ```bash
-oracle verify \
+dexter verify \
   --transcript-file /tmp/transcript.json \
   --task-file /tmp/task.json \
   --beads-status '{"total": 5, "completed": 5}' \
@@ -59,20 +59,20 @@ oracle verify \
 | `package_issue` | Work passes but a managed package has a gap |
 | `fail` | Fundamentally wrong approach |
 
-### `oracle ask`
+### `dexter ask`
 
 Ask a question about the project.
 
 ```bash
-oracle ask "How does authentication work?" --project /path/to/project --json
+dexter ask "How does authentication work?" --project /path/to/project --json
 ```
 
-### `oracle learn`
+### `dexter learn`
 
 Extract learnings from code changes or reviews.
 
 ```bash
-oracle learn --source "PR #123" --content "diff..." --project /path/to/project --json
+dexter learn --source "PR #123" --content "diff..." --project /path/to/project --json
 ```
 
 ## Common Options
@@ -109,5 +109,5 @@ Oracle uses a hierarchical config system:
 composer install
 vendor/bin/pest          # Run tests
 vendor/bin/pint          # Format code
-php oracle list          # List all commands
+php dexter list          # List all commands
 ```
