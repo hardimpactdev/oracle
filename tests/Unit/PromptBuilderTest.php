@@ -59,7 +59,7 @@ describe('PromptBuilder', function () {
             $context = new ProjectContext(
                 projectPath: '/tmp/test',
                 memories: [
-                    ['content' => 'Always use lockForUpdate in transactions', 'source' => 'oracle'],
+                    ['content' => 'Always use lockForUpdate in transactions', 'source' => 'dexter'],
                 ],
             );
 
@@ -162,7 +162,7 @@ describe('PromptBuilder', function () {
             $context = new ProjectContext(
                 projectPath: '/tmp/test',
                 conventions: '# Rules: Use strict types.',
-                memories: [['content' => 'Always use lockForUpdate', 'source' => 'oracle']],
+                memories: [['content' => 'Always use lockForUpdate', 'source' => 'dexter']],
             );
 
             $prompt = $this->builder->buildVerifyPrompt('transcript', 'task', '{}', $context);

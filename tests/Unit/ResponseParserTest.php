@@ -78,7 +78,7 @@ content here
         });
 
         it('reads output.json fallback', function () {
-            $tmpDir = sys_get_temp_dir().'/oracle_test_'.uniqid();
+            $tmpDir = sys_get_temp_dir().'/dexter_test_'.uniqid();
             mkdir($tmpDir);
             file_put_contents($tmpDir.'/output.json', '{"steps": [{"title": "test"}]}');
 

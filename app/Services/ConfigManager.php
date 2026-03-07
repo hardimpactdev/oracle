@@ -26,7 +26,7 @@ final class ConfigManager
 
     public function getGlobalConfigDir(): string
     {
-        return (getenv('HOME') ?: '/home/oracle').'/.config/oracle';
+        return (getenv('HOME') ?: '/home/dexter').'/.config/dexter';
     }
 
     public function loadGlobal(): void
@@ -39,7 +39,7 @@ final class ConfigManager
     public function loadProject(string $projectPath): void
     {
         $this->projectPath = $projectPath;
-        $configFile = $projectPath.'/.oracle.json';
+        $configFile = $projectPath.'/.dexter.json';
 
         if (File::exists($configFile)) {
             $this->projectConfig = json_decode(File::get($configFile), true) ?? [];
@@ -64,7 +64,7 @@ final class ConfigManager
     public function saveProject(string $projectPath): void
     {
         File::put(
-            $projectPath.'/.oracle.json',
+            $projectPath.'/.dexter.json',
             json_encode($this->projectConfig, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
@@ -106,7 +106,7 @@ final class ConfigManager
     public function hasProjectConfig(): bool
     {
         return $this->projectPath !== null
-            && File::exists($this->projectPath.'/.oracle.json');
+            && File::exists($this->projectPath.'/.dexter.json');
     }
 
     /**

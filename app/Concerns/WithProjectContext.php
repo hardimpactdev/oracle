@@ -27,7 +27,7 @@ trait WithProjectContext
         return $this->option('driver')
             ?? $config->projectGet('driver')
             ?? $config->get('driver')
-            ?? config('oracle.driver', 'gemini');
+            ?? config('dexter.driver', 'gemini');
     }
 
     protected function resolveModel(ConfigManager $config): string
@@ -36,13 +36,13 @@ trait WithProjectContext
         return $this->option('model')
             ?? $config->projectGet('model')
             ?? $config->get('model')
-            ?? config('oracle.model', 'gemini-2.5-flash');
+            ?? config('dexter.model', 'gemini-2.5-flash');
     }
 
     protected function resolveTimeout(ConfigManager $config): int
     {
         return (int) ($config->projectGet('timeout')
             ?? $config->get('timeout')
-            ?? config('oracle.timeout', 180));
+            ?? config('dexter.timeout', 180));
     }
 }

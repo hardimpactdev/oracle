@@ -1,5 +1,5 @@
 {
-    "name": "hardimpactdev/oracle",
+    "name": "hardimpactdev/dexter",
     "description": "Project-aware AI research & review CLI",
     "type": "project",
     "license": "MIT",
@@ -40,5 +40,5 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "bin": ["oracle"]
+    "bin": ["dexter"]
 }

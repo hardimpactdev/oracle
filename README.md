@@ -99,8 +99,8 @@ Oracle automatically gathers project context:
 
 Oracle uses a hierarchical config system:
 
-1. Global config (`~/.config/oracle/config.json`)
-2. Project config (`.oracle.json` in project root)
+1. Global config (`~/.config/dexter/config.json`)
+2. Project config (`.dexter.json` in project root)
 3. CLI flags (highest priority)
 
 ## Development

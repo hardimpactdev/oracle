@@ -102,7 +102,7 @@ final class AskCommand extends Command
         $prompt = $promptBuilder->buildAskPrompt($question, $context);
 
         // For ask, we want the raw text response — not parsed JSON
-        $promptFile = tempnam(sys_get_temp_dir(), 'oracle_prompt_');
+        $promptFile = tempnam(sys_get_temp_dir(), 'dexter_prompt_');
         if ($promptFile === false) {
             return $this->failWithMessage('Failed to create temporary prompt file.');
         }

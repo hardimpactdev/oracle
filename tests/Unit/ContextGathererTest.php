@@ -9,7 +9,7 @@ use App\Services\RecallClientInterface;
 
 describe('ContextGatherer', function () {
     it('reads AGENTS.md as conventions', function () {
-        $tmpDir = sys_get_temp_dir().'/oracle_test_context_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_context_'.uniqid();
         mkdir($tmpDir, 0755, true);
         file_put_contents($tmpDir.'/AGENTS.md', '# Project Conventions');
 
@@ -32,7 +32,7 @@ describe('ContextGatherer', function () {
     });
 
     it('falls back to CLAUDE.md when AGENTS.md missing', function () {
-        $tmpDir = sys_get_temp_dir().'/oracle_test_context_fb_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_context_fb_'.uniqid();
         mkdir($tmpDir, 0755, true);
         file_put_contents($tmpDir.'/CLAUDE.md', '# Claude Conventions');
 
@@ -52,7 +52,7 @@ describe('ContextGatherer', function () {
     });
 
     it('reads docs/solutions/ files', function () {
-        $tmpDir = sys_get_temp_dir().'/oracle_test_context_docs_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_context_docs_'.uniqid();
         mkdir($tmpDir.'/docs/solutions', 0755, true);
         file_put_contents($tmpDir.'/docs/solutions/fix.md', '# Fix Guide');
 
@@ -75,7 +75,7 @@ describe('ContextGatherer', function () {
     });
 
     it('queries recall when query is provided', function () {
-        $tmpDir = sys_get_temp_dir().'/oracle_test_context_recall_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_context_recall_'.uniqid();
         mkdir($tmpDir, 0755, true);
 
         $recall = Mockery::mock(RecallClientInterface::class);
@@ -83,7 +83,7 @@ describe('ContextGatherer', function () {
             ->with('dark mode', null)
             ->once()
             ->andReturn([
-                ['content' => 'Use CSS variables for theming', 'source' => 'oracle'],
+                ['content' => 'Use CSS variables for theming', 'source' => 'dexter'],
             ]);
 
         $config = new ConfigManager;
@@ -99,7 +99,7 @@ describe('ContextGatherer', function () {
     });
 
     it('handles recall failures gracefully', function () {
-        $tmpDir = sys_get_temp_dir().'/oracle_test_context_fail_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_context_fail_'.uniqid();
         mkdir($tmpDir, 0755, true);
 
         $recall = Mockery::mock(RecallClientInterface::class);

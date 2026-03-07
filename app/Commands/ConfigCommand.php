@@ -45,10 +45,10 @@ final class ConfigCommand extends Command
         $project = $config->projectGet() ?? [];
 
         $resolved = [
-            'driver' => $config->resolve('driver', config('oracle.driver')),
-            'model' => $config->resolve('model', config('oracle.model')),
-            'timeout' => $config->resolve('timeout', config('oracle.timeout')),
-            'recall_url' => $config->resolve('recall_url', config('oracle.recall_url')),
+            'driver' => $config->resolve('driver', config('dexter.driver')),
+            'model' => $config->resolve('model', config('dexter.model')),
+            'timeout' => $config->resolve('timeout', config('dexter.timeout')),
+            'recall_url' => $config->resolve('recall_url', config('dexter.recall_url')),
         ];
 
         if ($this->wantsJson()) {
@@ -72,14 +72,14 @@ final class ConfigCommand extends Command
 
         $this->newLine();
         $this->line('<fg=cyan;options=bold>Project Config</>');
-        $this->line('  Path: '.$projectPath.'/.oracle.json');
+        $this->line('  Path: '.$projectPath.'/.dexter.json');
 
         if (is_array($project) && $project !== []) {
             foreach ($project as $key => $value) {
                 $this->line("  {$key}: ".json_encode($value));
             }
         } else {
-            $this->line('  (not initialized — run `oracle init`)');
+            $this->line('  (not initialized — run `dexter init`)');
         }
 
         $this->newLine();
@@ -123,7 +123,7 @@ final class ConfigCommand extends Command
         $value = $this->argument('value');
 
         if ($key === null || $value === null) {
-            return $this->failWithMessage('Usage: oracle config set <key> <value>');
+            return $this->failWithMessage('Usage: dexter config set <key> <value>');
         }
 
         // Try to decode JSON values (for arrays/objects)

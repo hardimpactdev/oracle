@@ -85,7 +85,7 @@ final class LearnCommand extends Command
         /** @var string|null $category */
         $category = $this->option('category');
 
-        $id = $recall->store($content, $importance, $agentId, 'oracle:direct', $category);
+        $id = $recall->store($content, $importance, $agentId, 'dexter:direct', $category);
 
         if ($id === null) {
             return $this->failWithMessage('Failed to store learning in Recall.');
@@ -212,7 +212,7 @@ final class LearnCommand extends Command
             $imp = (float) ($learning['importance'] ?? $defaultImportance);
             $category = $learning['category'] ?? null;
 
-            $id = $recall->store($learning['content'], $imp, $agentId, "oracle:{$source}", $category);
+            $id = $recall->store($learning['content'], $imp, $agentId, "dexter:{$source}", $category);
 
             if ($id !== null) {
                 $stored[] = ['id' => $id, 'content' => $learning['content'], 'category' => $category];
@@ -241,7 +241,7 @@ final class LearnCommand extends Command
      */
     private function writeDocs(array $learnings, string $projectPath): void
     {
-        $docsDir = $projectPath.'/docs/solutions/oracle';
+        $docsDir = $projectPath.'/docs/solutions/dexter';
         if (! is_dir($docsDir)) {
             mkdir($docsDir, 0755, true);
         }

@@ -16,9 +16,9 @@ use LaravelZero\Framework\Commands\Command;
  * prompts stay in the caller while Oracle handles driver routing and auth.
  *
  * Usage:
- *   echo "$prompt" | oracle call --json
- *   echo "$prompt" | oracle call --json --driver claude --model claude-opus-4-5
- *   echo "$prompt" | oracle call --json --driver gemini --timeout 300
+ *   echo "$prompt" | dexter call --json
+ *   echo "$prompt" | dexter call --json --driver claude --model claude-opus-4-5
+ *   echo "$prompt" | dexter call --json --driver gemini --timeout 300
  */
 final class CallCommand extends Command
 {
@@ -49,16 +49,16 @@ final class CallCommand extends Command
         /** @var string $driverName */
         $driverName = $this->option('driver')
             ?? $config->get('driver')
-            ?? config('oracle.driver', 'gemini');
+            ?? config('dexter.driver', 'gemini');
 
         /** @var string $model */
         $model = $this->option('model')
             ?? $config->get('model')
-            ?? config('oracle.model', 'gemini-2.5-flash');
+            ?? config('dexter.model', 'gemini-2.5-flash');
 
         $timeout = (int) ($this->option('timeout')
             ?? $config->get('timeout')
-            ?? config('oracle.timeout', 180));
+            ?? config('dexter.timeout', 180));
 
         $driver = match ($driverName) {
             'claude' => new \App\Drivers\ClaudeDriver,

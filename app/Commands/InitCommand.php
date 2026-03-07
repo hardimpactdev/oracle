@@ -24,8 +24,8 @@ final class InitCommand extends Command
     {
         $projectPath = (string) getcwd();
 
-        if (is_file($projectPath.'/.oracle.json')) {
-            return $this->failWithMessage('.oracle.json already exists in this directory.');
+        if (is_file($projectPath.'/.dexter.json')) {
+            return $this->failWithMessage('.dexter.json already exists in this directory.');
         }
 
         /** @var string $driver */
@@ -40,16 +40,16 @@ final class InitCommand extends Command
             $model = $this->ask('Default model?', $this->defaultModelFor($driver));
 
             /** @var string|null $recallAgentId */
-            $recallAgentId = $this->ask('Recall agent ID? (for memory scoping)', 'oracle-'.basename($projectPath));
+            $recallAgentId = $this->ask('Recall agent ID? (for memory scoping)', 'dexter-'.basename($projectPath));
         } else {
             $model ??= $this->defaultModelFor($driver);
-            $recallAgentId = 'oracle-'.basename($projectPath);
+            $recallAgentId = 'dexter-'.basename($projectPath);
         }
 
         $projectConfig = [
             'driver' => $driver,
             'model' => $model,
-            'recall_agent_id' => $recallAgentId ?? 'oracle-'.basename($projectPath),
+            'recall_agent_id' => $recallAgentId ?? 'dexter-'.basename($projectPath),
             'context_paths' => $this->detectContextPaths($projectPath),
             'conventions_file' => $this->detectConventionsFile($projectPath),
         ];
@@ -61,10 +61,10 @@ final class InitCommand extends Command
             return $this->outputJsonSuccess($projectConfig);
         }
 
-        $this->info('Created .oracle.json');
+        $this->info('Created .dexter.json');
         $this->line('  Driver: '.$driver);
         $this->line('  Model: '.$model);
-        $this->line('  Recall Agent: '.($recallAgentId ?? 'oracle-'.basename($projectPath)));
+        $this->line('  Recall Agent: '.($recallAgentId ?? 'dexter-'.basename($projectPath)));
 
         return self::SUCCESS;
     }

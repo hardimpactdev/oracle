@@ -21,4 +21,4 @@ if [ "$CLEANUP" = "1" ]; then
   rm -f "$KEEP_FILE"
 fi
 
-echo "Built: $(pwd)/builds/oracle.phar"
+echo "Built: $(pwd)/builds/dexter.phar"

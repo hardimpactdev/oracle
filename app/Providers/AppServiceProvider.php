@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
             $config = $app->make(ConfigManager::class);
 
             /** @var string $url */
-            $url = $config->resolve('recall_url') ?? config('oracle.recall_url');
+            $url = $config->resolve('recall_url') ?? config('dexter.recall_url');
 
             return new RecallClient($url);
         });
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $config = $app->make(ConfigManager::class);
 
             /** @var string $driver */
-            $driver = $config->resolve('driver') ?? config('oracle.driver', 'gemini');
+            $driver = $config->resolve('driver') ?? config('dexter.driver', 'gemini');
 
             return match ($driver) {
                 'claude' => new ClaudeDriver,

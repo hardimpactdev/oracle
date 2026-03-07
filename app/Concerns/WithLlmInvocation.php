@@ -17,7 +17,7 @@ trait WithLlmInvocation
         string $workingDirectory,
         int $timeout = 180,
     ): ?array {
-        $promptFile = tempnam(sys_get_temp_dir(), 'oracle_prompt_');
+        $promptFile = tempnam(sys_get_temp_dir(), 'dexter_prompt_');
         if ($promptFile === false) {
             throw new \RuntimeException('Failed to create temporary prompt file');
         }
@@ -52,7 +52,7 @@ trait WithLlmInvocation
     protected function processEnv(): array
     {
         /** @var string $extraPath */
-        $extraPath = config('oracle.extra_path', '');
+        $extraPath = config('dexter.extra_path', '');
 
         if ($extraPath === '') {
             return [];

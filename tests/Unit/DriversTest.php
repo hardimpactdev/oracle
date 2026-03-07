@@ -97,7 +97,7 @@ describe('CodexDriver', function () {
     });
 
     it('builds correct command', function () {
-        $promptFile = tempnam(sys_get_temp_dir(), 'oracle_test_');
+        $promptFile = tempnam(sys_get_temp_dir(), 'dexter_test_');
         file_put_contents($promptFile, 'test prompt content');
 
         $command = $this->driver->buildCommand($promptFile, 'codex-mini-latest');

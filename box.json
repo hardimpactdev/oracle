@@ -1,6 +1,6 @@
 {
-    "main": "oracle",
-    "output": "builds/oracle.phar",
+    "main": "dexter",
+    "output": "builds/dexter.phar",
     "chmod": "0755",
     "directories": [
         "app",

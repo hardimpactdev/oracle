@@ -14,7 +14,7 @@ final class RecallClient implements RecallClientInterface
     public function __construct(?string $baseUrl = null)
     {
         /** @var string $url */
-        $url = $baseUrl ?? config('oracle.recall_url', 'https://recall.beast');
+        $url = $baseUrl ?? config('dexter.recall_url', 'https://recall.beast');
 
         $this->client = new Client([
             'base_uri' => rtrim($url, '/'),

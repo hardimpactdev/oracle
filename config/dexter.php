@@ -11,8 +11,8 @@ return [
     'recall_url' => env('ORACLE_RECALL_URL', 'https://recall.beast'),
 
     'extra_path' => env('ORACLE_EXTRA_PATH', implode(':', array_filter([
-        (getenv('HOME') ?: '/home/oracle').'/.bun/bin',
-        (getenv('HOME') ?: '/home/oracle').'/.local/bin',
+        (getenv('HOME') ?: '/home/dexter').'/.bun/bin',
+        (getenv('HOME') ?: '/home/dexter').'/.local/bin',
     ]))),
 
 ];

@@ -9,7 +9,7 @@ describe('ConfigManager', function () {
     it('reads and writes global config', function () {
         $config = new ConfigManager;
 
-        $tmpDir = sys_get_temp_dir().'/oracle_test_config_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_config_'.uniqid();
         mkdir($tmpDir, 0755, true);
 
         // Write a config file to a known location
@@ -29,9 +29,9 @@ describe('ConfigManager', function () {
     it('loads project config', function () {
         $config = new ConfigManager;
 
-        $tmpDir = sys_get_temp_dir().'/oracle_test_project_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_project_'.uniqid();
         mkdir($tmpDir, 0755, true);
-        file_put_contents($tmpDir.'/.oracle.json', json_encode([
+        file_put_contents($tmpDir.'/.dexter.json', json_encode([
             'driver' => 'claude',
             'model' => 'claude-sonnet-4-5-20250514',
         ]));
@@ -43,16 +43,16 @@ describe('ConfigManager', function () {
         expect($config->projectGet('nonexistent'))->toBeNull();
 
         // Cleanup
-        @unlink($tmpDir.'/.oracle.json');
+        @unlink($tmpDir.'/.dexter.json');
         @rmdir($tmpDir);
     });
 
     it('resolves with project overriding global', function () {
         $config = new ConfigManager;
 
-        $tmpDir = sys_get_temp_dir().'/oracle_test_resolve_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_resolve_'.uniqid();
         mkdir($tmpDir, 0755, true);
-        file_put_contents($tmpDir.'/.oracle.json', json_encode(['driver' => 'claude']));
+        file_put_contents($tmpDir.'/.dexter.json', json_encode(['driver' => 'claude']));
 
         $config->loadProject($tmpDir);
 
@@ -63,24 +63,24 @@ describe('ConfigManager', function () {
         expect($config->resolve('timeout', 180))->toBe(180);
 
         // Cleanup
-        @unlink($tmpDir.'/.oracle.json');
+        @unlink($tmpDir.'/.dexter.json');
         @rmdir($tmpDir);
     });
 
     it('saves project config', function () {
         $config = new ConfigManager;
 
-        $tmpDir = sys_get_temp_dir().'/oracle_test_save_'.uniqid();
+        $tmpDir = sys_get_temp_dir().'/dexter_test_save_'.uniqid();
         mkdir($tmpDir, 0755, true);
 
         $config->setProjectConfig(['driver' => 'codex', 'model' => 'codex-mini']);
         $config->saveProject($tmpDir);
 
-        $saved = json_decode(file_get_contents($tmpDir.'/.oracle.json'), true);
+        $saved = json_decode(file_get_contents($tmpDir.'/.dexter.json'), true);
         expect($saved)->toBe(['driver' => 'codex', 'model' => 'codex-mini']);
 
         // Cleanup
-        @unlink($tmpDir.'/.oracle.json');
+        @unlink($tmpDir.'/.dexter.json');
         @rmdir($tmpDir);
     });
 });
